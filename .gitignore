@@ -5,6 +5,8 @@ static/uploadfile
 temp/
 !temp
 vendor
+go-admin
+go-admin.exe
 config/settings.dev.yml
 config/settings.dev.*.yml
 config/settings.dev.*.yml.log

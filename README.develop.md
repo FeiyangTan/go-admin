@@ -38,13 +38,15 @@ cd /opt
 ```bash
 git clone git@github.com:FeiyangTan/go-admin.git
 ````
-* 补全git不包含的信息(本地运行)
+* 下载go（如果服务器没有go或者go版本不对）
 ```bash
-  scp ./1.go root@server.ip:/opt/go/
+  cd /tmp
+  wget https://golang.google.cn/dl/go1.24.5.linux-arm64.tar.gz
+  
 ```
 * go可执行文件编译(服务器运行)
 ```bash
-go tidy
+go mod tidy
 GOOS=linux GOARCH=amd64 go build -o go-admin main.go
 ```
 
