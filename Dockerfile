@@ -1,4 +1,4 @@
-FROM alpine
+FROM docker.mirrors.ustc.edu.cn/alpine:latest
 
 ENV GOPROXY https://goproxy.cn/
 
