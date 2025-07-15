@@ -1,6 +1,6 @@
-FROM docker.mirrors.ustc.edu.cn/alpine:latest
+FROM alpine
 
-ENV GOPROXY https://goproxy.cn/
+# ENV GOPROXY https://goproxy.cn/
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
 
