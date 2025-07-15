@@ -49,12 +49,20 @@ git clone git@github.com:FeiyangTan/go-admin.git
 go mod tidy
 GOOS=linux GOARCH=amd64 go build -o go-admin main.go
 ```
+* 构建docker image
+```bash
+docker build -t qixiaoqi-server:latest .
+```
 
-
-### 本地上传到git
-* git push -u origin main
+### 更新代码
+* 本地上传到git
+```bash
+git push -u origin main
+````
 ### 服务器下载代码
-* git clone
+```bash
+git pull
+````
 
 ## 开发环境运行
 ### 更新docker image
