@@ -22,11 +22,11 @@ type WxSessionResp struct {
 
 // LoginReq 是前端传来的登录请求参数
 type LoginReq struct {
-	Code          string `json:"code" binding:"required"`
-	EncryptedData string `json:"encryptedData" binding:"required"`
-	Iv            string `json:"iv" binding:"required"`
-	RawData       string `json:"rawData"`
-	Signature     string `json:"signature"`
+	Code string `json:"code" binding:"required"`
+	//EncryptedData string `json:"encryptedData" binding:"required"`
+	//Iv            string `json:"iv" binding:"required"`
+	//RawData       string `json:"rawData"`
+	//Signature     string `json:"signature"`
 }
 
 type UserAPI struct {
@@ -48,6 +48,7 @@ func (u *UserAPI) Login(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "参数错误: " + err.Error()})
 		return
 	}
+
 	wxURL := fmt.Sprintf(
 		"https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
 		config.AppID, config.AppSecret, req.Code,
@@ -69,36 +70,33 @@ func (u *UserAPI) Login(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(wxResp)
-	// 2. 解密用户信息，以获取昵称、头像等公开信息
-	decrypted, err := util.DecryptWeChatData(wxResp.SessionKey, req.EncryptedData, req.Iv)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "解密用户数据失败: " + err.Error()})
-		return
-	}
-
-	var profile struct {
-		NickName  string `json:"nickName"`
-		AvatarURL string `json:"avatarUrl"`
-	}
-	if err := json.Unmarshal(decrypted, &profile); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "解析用户数据失败: " + err.Error()})
-		return
-	}
-	fmt.Println(profile)
+	//// 2. 解密用户信息，以获取昵称、头像等公开信息
+	//decrypted, err := util.DecryptWeChatData(wxResp.SessionKey, req.EncryptedData, req.Iv)
+	//if err != nil {
+	//	c.JSON(http.StatusInternalServerError, gin.H{"message": "解密用户数据失败: " + err.Error()})
+	//	return
+	//}
+	//
+	//var profile struct {
+	//	NickName  string `json:"nickName"`
+	//	AvatarURL string `json:"avatarUrl"`
+	//}
+	//if err := json.Unmarshal(decrypted, &profile); err != nil {
+	//	c.JSON(http.StatusInternalServerError, gin.H{"message": "解析用户数据失败: " + err.Error()})
+	//	return
+	//}
+	//fmt.Println(profile)
 
 	// 3. 数据库：获取或创建用户，使用 jscode2session 返回的 openid
 	//db := c.MustGet("DB").(*gorm.DB)
 	//user, err := models.GetOrCreateUser(db, wxResp.OpenID, profile.NickName, profile.AvatarURL)
 	s := service.NewWechatUserService(&u.Api)
-	fmt.Println(s)
 
-	user, err := s.GetOrCreateUser(wxResp.OpenID, profile.NickName, profile.AvatarURL)
+	user, err := s.GetOrCreateUser(wxResp.OpenID, config.DefaultNickName, config.DefaultAvatarURL)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "数据库操作失败: " + err.Error()})
 		return
 	}
-
 	fmt.Println(user)
 
 	// 4. 生成 JWT，返回结果

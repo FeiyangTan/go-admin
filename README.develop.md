@@ -1,16 +1,23 @@
 # 开发信息记录
 
 ## 运行代码
-### 运行最新代码
+### 运行最新代码（要docker运行，因为含有enn文件）
 ```bash
 # 本地
-go run main.go server -c config/settings.yml
+GOOS=linux GOARCH=amd64 go build -o go-admin main.go #构建新的可执行文件
+
+docker build -t aixiaoqi-server:latest . #构建新的docker镜像
+docker compose up #执行docker-compose文件
 ````
-### 运行代码，且更新接口数据（可能是Swagger文档）
+### 暂停之前的docker container
 ```bash
 # 本地
-go run main.go server -c config/settings.yml -a true
+docker compose down #停止并移除旧容器
+
+docker images               # 找到 a ixiaoqi-server:latest 的 IMAGE ID
+docker rmi <IMAGE_ID>  #删除旧的docker镜像
 ````
+
 ## 备注信息
 * 创建新表后，手动创建数据库（可能存在自动的方法）
 * app/admin 中后台接口
@@ -88,7 +95,7 @@ docker buildx create --use --name amd64builder
   * docker buildx use amd64builder # 切换到已有的 amd64builder
 
 ```bash
-# 在 M1/M2 上构建 amd64 镜像并直接输出成 tar 文件
+# 本地，在 M1/M2 上构建 amd64 镜像并直接输出成 tar 文件
 docker buildx build \
   --platform linux/amd64 \
   -t aixiaoqi-server:latest \

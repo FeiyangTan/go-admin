@@ -3,13 +3,17 @@ package config
 
 import "os"
 
-// 微信小程序的 AppID 和 AppSecret
 var (
+	// 微信小程序的 AppID 和 AppSecret
 	AppID     = os.Getenv("WEAPP_APPID")
 	AppSecret = os.Getenv("WEAPP_APPSECRET")
 
 	// 用于签发和校验 JWT 的密钥，建议至少 32 字节随机字符串
 	JwtSecret = os.Getenv("Jwt_SECRET")
+
+	// 新用户的默认昵称和头像
+	DefaultNickName  = "艾小蕲用户"
+	DefaultAvatarURL = "https://ai-qiai.oss-cn-guangzhou.aliyuncs.com/panda.png"
 )
 
 // OSSConfig holds configuration for Alibaba Cloud OSS
