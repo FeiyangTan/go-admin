@@ -15,6 +15,7 @@ func registerOSSRouter(v1 *gin.RouterGroup) {
 	// 二级路由前缀，例如 /api/v1/oss
 	r := v1.Group("/oss")
 	{
-		r.GET("/signature", apis.GetOSSOptions) // GET /api/v1/oss/signature
+		r.GET("/uploadImageSignature", apis.GetOSSImageSignature)   // GET /api/v1/oss/uploadImageSignature
+		r.GET("/uploadAvatarSignature", apis.GetOSSAvatarSignature) // GET /api/v1/oss/uploadImageSignature
 	}
 }

@@ -43,12 +43,37 @@ git push -u origin main
 ### 服务器更新代码
 ```bash
 # 服务器
+cd /opt/go-admin
 git pull
+GOOS=linux GOARCH=amd64 go build -o go-admin main.go #构建新的可执行文件
 ````
-### 重新编译可执行文件
+### 上传新的docker image
+```bash
+# 本地，在 M1/M2 上构建 amd64 镜像并直接输出成 tar 文件
+docker buildx build \
+  --platform linux/amd64 \
+  -t aixiaoqi-server:latest \
+  --output type=docker,dest=./aixiaoqi-server.tar \
+  .
+# 上传到服务器
+scp aixiaoqi-server.tar root@111.230.167.45:/opt/go-admin
+````
+### 删除旧的服务
+```bash
+# 服务器
+docker compose down #停止并移除旧容器
 
-### 重启docker？
-
+docker images               # 找到 a ixiaoqi-server:latest 的 IMAGE ID
+docker rmi <IMAGE_ID>  #删除旧的docker镜像
+````
+### 重启docker container
+```bash
+# 服务器
+docker load -i aixiaoqi-server.tar
+docker image ls #查看image列表
+docker compose up -d #执行docker-compose文件
+docker logs -f aixiaoqi-server #查看docker记录
+````
 ---------------------------------
 ## 首次部署开发环境
 ### 服务器编译服可执行文件（方面后续更新代码）

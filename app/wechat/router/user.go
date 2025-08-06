@@ -15,9 +15,9 @@ func registerUserRouter(v1 *gin.RouterGroup) {
 	// 这里设定你想要的二级路由前缀
 	r := v1.Group("/wechat")
 	{
-		r.POST("/login", api.Login)       // POST /api/v1/wechat/login
-		r.POST("/signup", api.Signup)     // POST /api/v1/wechat/signup
-		r.GET("/profile", api.GetProfile) // GET  /api/v1/wechat/profile
-		// ... 按需添加更多
+		r.POST("/login", api.Login) // POST /api/v1/wechat/login
+		//r.POST("/signup", api.Signup)     // POST /api/v1/wechat/signup
+		//r.GET("/profile", api.GetProfile) // GET  /api/v1/wechat/profile
+		r.POST("/setUserInfo", api.SetUserInfo) // POST  /api/v1/wechat/setUserInfo
 	}
 }

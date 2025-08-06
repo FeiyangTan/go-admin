@@ -78,3 +78,20 @@ func (s *WechatUserService) GetUserDiagnosisNum(openid string) (faceCount uint16
 	tongueCount = user.TongueCount
 	return faceCount, tongueCount, nil
 }
+
+// 修改用户名称和头像
+func (s *WechatUserService) SetUserInfo(openid, nickname, avatarUrl string) error {
+	db, _ := s.GetOrm() // 从 s.Api 已初始化的 Orm 拿到 *gorm.DB
+	// 修改用户名称和头像
+	if err := db.
+		Model(&models.User{}).
+		Where("open_id = ?", openid).
+		Updates(map[string]interface{}{
+			"nick_name":  nickname,
+			"avatar_url": avatarUrl,
+		}).
+		Error; err != nil {
+		return err
+	}
+	return nil
+}

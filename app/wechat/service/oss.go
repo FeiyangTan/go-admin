@@ -21,11 +21,11 @@ type PolicySignature struct {
 }
 
 // GeneratePolicySignature 生成 OSS 表单直传的签名数据
-func GeneratePolicySignature() (*PolicySignature, error) {
+func GeneratePolicySignature(file string) (*PolicySignature, error) {
 	cfg := config.GetOSSConfig()
 
 	// 构造上传前缀，按日期分目录
-	dir := cfg.DirPrefix + time.Now().Format("2006-01-02") + "/"
+	dir := cfg.DirPrefix + file
 
 	// 计算过期时间
 	expireTime := time.Now().Add(time.Duration(cfg.ExpireSeconds) * time.Second).UTC()

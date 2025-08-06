@@ -20,13 +20,16 @@ type WxSessionResp struct {
 	ErrMsg     string `json:"errmsg"`
 }
 
-// LoginReq 是前端传来的登录请求参数
+// Login 接口前端传来的登录请求参数
 type LoginReq struct {
 	Code string `json:"code" binding:"required"`
-	//EncryptedData string `json:"encryptedData" binding:"required"`
-	//Iv            string `json:"iv" binding:"required"`
-	//RawData       string `json:"rawData"`
-	//Signature     string `json:"signature"`
+}
+
+// setUserInfo 接口前端传来的登录请求参数
+type setUserInfoReq struct {
+	OpenID    string `json:"open_id" binding:"required"`
+	NickName  string `json:"nick_name" binding:"required"`
+	AvatarURL string `json:"avatar_url" binding:"required"`
 }
 
 type UserAPI struct {
@@ -70,23 +73,6 @@ func (u *UserAPI) Login(c *gin.Context) {
 		return
 	}
 
-	//// 2. 解密用户信息，以获取昵称、头像等公开信息
-	//decrypted, err := util.DecryptWeChatData(wxResp.SessionKey, req.EncryptedData, req.Iv)
-	//if err != nil {
-	//	c.JSON(http.StatusInternalServerError, gin.H{"message": "解密用户数据失败: " + err.Error()})
-	//	return
-	//}
-	//
-	//var profile struct {
-	//	NickName  string `json:"nickName"`
-	//	AvatarURL string `json:"avatarUrl"`
-	//}
-	//if err := json.Unmarshal(decrypted, &profile); err != nil {
-	//	c.JSON(http.StatusInternalServerError, gin.H{"message": "解析用户数据失败: " + err.Error()})
-	//	return
-	//}
-	//fmt.Println(profile)
-
 	// 3. 数据库：获取或创建用户，使用 jscode2session 返回的 openid
 	//db := c.MustGet("DB").(*gorm.DB)
 	//user, err := models.GetOrCreateUser(db, wxResp.OpenID, profile.NickName, profile.AvatarURL)
@@ -117,16 +103,49 @@ func (u *UserAPI) Login(c *gin.Context) {
 
 }
 
-// POST /api/v1/wechat/signup
-func (u *UserAPI) Signup(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"code": 2,
-	})
-}
+//// POST /api/v1/wechat/signup
+//func (u *UserAPI) Signup(c *gin.Context) {
+//	c.JSON(http.StatusOK, gin.H{
+//		"code": 2,
+//	})
+//}
+//
+//// GET /api/v1/wechat/profile
+//func (u *UserAPI) GetProfile(c *gin.Context) {
+//	c.JSON(http.StatusOK, gin.H{
+//		"code": 3,
+//	})
+//}
 
-// GET /api/v1/wechat/profile
-func (u *UserAPI) GetProfile(c *gin.Context) {
+// POST /api/v1/wechat/setUserInfo
+func (u *UserAPI) SetUserInfo(c *gin.Context) {
+
+	// 0. 初始化 Api 上下文和 ORM
+	if err := u.MakeContext(c).MakeOrm().Errors; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "初始化失败: " + err.Error()})
+		return
+	}
+
+	// 1. 获取响应数据
+	var req setUserInfoReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "参数错误: " + err.Error()})
+		return
+	}
+	fmt.Println(req)
+
+	// 2. 数据库：修改用户信息
+	s := service.NewWechatUserService(&u.Api)
+
+	err := s.SetUserInfo(req.OpenID, req.NickName, req.AvatarURL)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "数据库操作失败: " + err.Error()})
+		return
+	}
+
+	// 4. 返回结果
 	c.JSON(http.StatusOK, gin.H{
-		"code": 3,
+		"state": "success",
 	})
+
 }
