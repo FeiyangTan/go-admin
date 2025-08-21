@@ -9,6 +9,7 @@ services:
       - Jwt_SECRET=${Jwt_SECRET}
       - OSS_ACCESS_KEY_ID=${OSS_ACCESS_KEY_ID}
       - OSS_ACCESS_KEY_SECRET=${OSS_ACCESS_KEY_SECRET}
+      - AI_APPCODE=${AI_APPCODE}
     privileged: true
     restart: always
     ports:

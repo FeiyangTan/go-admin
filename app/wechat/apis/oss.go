@@ -1,6 +1,7 @@
 package apis
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -26,6 +27,7 @@ func GetOSSImageSignature(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	fmt.Println(sig)
 	// 转换为前端定义的结构体（可选）
 	resp := OSSOptionsResponse{
 		AccessID:  sig.AccessID,
@@ -38,7 +40,7 @@ func GetOSSImageSignature(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// GetOSSImageSignature 小程序调用此接口获取照片上传签名
+// GetOSSImageSignature 小程序调用此接口获取头像上传签名
 func GetOSSAvatarSignature(c *gin.Context) {
 	sig, err := service.GeneratePolicySignature("avatar/")
 	if err != nil {

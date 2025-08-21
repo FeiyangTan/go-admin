@@ -14,6 +14,8 @@ var (
 	// 新用户的默认昵称和头像
 	DefaultNickName  = "艾小蕲用户"
 	DefaultAvatarURL = "https://ai-qiai.oss-cn-guangzhou.aliyuncs.com/panda.png"
+
+	AIAPPCODE = os.Getenv("AI_APPCODE")
 )
 
 // OSSConfig holds configuration for Alibaba Cloud OSS

@@ -1,13 +1,19 @@
 # 开发信息记录
 
 ## 运行代码
-### 运行最新代码（要docker运行，因为含有enn文件）
+### 直接运行
 ```bash
 # 本地
-GOOS=linux GOARCH=amd64 go build -o go-admin main.go #构建新的可执行文件
+#设置环境变量
+export WEAPP_APPID=xxx
+export WEAPP_APPSECRET=xxx
+export Jwt_SECRET=xxx
+export OSS_ACCESS_KEY_ID=xxx
+export OSS_ACCESS_KEY_SECRET=xxx
+export AI_APPCODE=xxx
 
-docker build -t aixiaoqi-server:latest . #构建新的docker镜像
-docker compose up #执行docker-compose文件
+# 运行
+go run main.go server -c config/settings.yml
 ````
 ### 暂停之前的docker container
 ```bash
@@ -17,6 +23,15 @@ docker compose down #停止并移除旧容器
 docker images               # 找到 a ixiaoqi-server:latest 的 IMAGE ID
 docker rmi <IMAGE_ID>  #删除旧的docker镜像
 ````
+### 运行最新代码（要docker运行，因为含有enn文件）
+```bash
+# 本地
+GOOS=linux GOARCH=amd64 go build -o go-admin main.go #构建新的可执行文件
+
+docker build -t aixiaoqi-server:latest . #构建新的docker镜像
+docker compose up #执行docker-compose文件
+````
+
 
 ## 备注信息
 * 创建新表后，手动创建数据库（可能存在自动的方法）

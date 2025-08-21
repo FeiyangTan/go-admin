@@ -15,8 +15,9 @@ func registerDiagnosisRouter(v1 *gin.RouterGroup) {
 	// 这里设定你想要的二级路由前缀
 	r := v1.Group("/wechat")
 	{
-		r.POST("/addDiagnosis", api.AddDiagnosis)         // POST /api/v1/wechat/addDiagnosis
-		r.POST("/userDiagnosisNum", api.UserDiagnosisNum) // POST /api/v1/wechat/UserDiagnosisNum
-		r.POST("/diagnosisList", api.DiagnosisList)       // POST /api/v1/wechat/UserDiagnosisNum
+		r.POST("/addDiagnosis", api.AddDiagnosis)        // POST /api/v1/wechat/addDiagnosis
+		r.POST("/newDiagnosis", api.NewDiagnosis)        // POST /api/v1/wechat/newDiagnosis
+		r.GET("/userDiagnosisNum", api.UserDiagnosisNum) // GET /api/v1/wechat/UserDiagnosisNum
+		r.GET("/diagnosisList", api.DiagnosisList)       // POST /api/v1/wechat/UserDiagnosisNum
 	}
 }
