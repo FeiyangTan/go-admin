@@ -32,9 +32,27 @@ docker build -t aixiaoqi-server:latest . #构建新的docker镜像
 docker compose up #执行docker-compose文件
 ````
 
-
+---------------------------------
 ## 备注信息
-* 创建新表后，手动创建数据库（可能存在自动的方法）
+* 创建新表后，手动创建数据库
+```bash
+# sql参考代码
+CREATE TABLE `article` (
+                           `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT '编码',
+                           `title` varchar(128) DEFAULT NULL COMMENT '标题',
+                           `author` varchar(128) DEFAULT NULL COMMENT '作者',
+                           `content` varchar(255) DEFAULT NULL COMMENT '内容',
+                           `status` int(1) DEFAULT NULL COMMENT '状态',
+                           `publish_at` timestamp NULL DEFAULT NULL COMMENT '发布时间',
+                           `created_at` timestamp NULL DEFAULT NULL,
+                           `updated_at` timestamp NULL DEFAULT NULL,
+                           `deleted_at` timestamp NULL DEFAULT NULL,
+                           `create_by` int(11) unsigned DEFAULT NULL,
+                           `update_by` int(11) unsigned DEFAULT NULL,
+                           PRIMARY KEY (`id`),
+                           KEY `idx_article_deleted_at` (`deleted_at`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='文章';
+````
 * app/admin 中后台接口
 * app/wechat 微信端接口
 * config/settings.yml 使用的配置文件
@@ -50,10 +68,15 @@ docker compose up #执行docker-compose文件
 
 ------
 ## 更新服务
-* 本地代码上传到git
+### 本地代码上传到git
 ```bash
 # 本地
 git push -u origin main
+````
+### 链接服务器
+```bash
+# 本地
+ssh root@111.230.167.45
 ````
 ### 服务器更新代码
 ```bash

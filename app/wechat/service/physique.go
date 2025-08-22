@@ -31,3 +31,12 @@ func (s *WechatPhysiqueService) GetPhysiqueInfo(physiqueName string) (*models.Ph
 
 	return &physique, nil
 }
+
+// CreatePhysique 直接创建一条新纪录
+func (s *WechatPhysiqueService) CreatePhysique(p *models.Physique) (*models.Physique, error) {
+	db, _ := s.GetOrm()
+	if err := db.Create(p).Error; err != nil {
+		return nil, err
+	}
+	return p, nil
+}

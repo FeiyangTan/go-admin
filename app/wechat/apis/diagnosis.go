@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-admin-team/go-admin-core/sdk/api"
+	"go-admin/app/wechat/models"
 	"go-admin/app/wechat/service"
 	"gorm.io/datatypes"
 	"io"
@@ -202,9 +203,26 @@ func (d *DiagnosisAPI) NewDiagnosis(c *gin.Context) {
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"message": "获取体质对应信息错误: " + err.Error()})
 				return
-			} else if physiqueInfo == nil {
-				c.JSON(http.StatusNotFound, gin.H{"message": "未找到对应的体质信息"})
-				return
+			} else if physiqueInfo == nil || physiqueInfo.AcupunctureMethod == "" {
+				// 未找到对应的体质信息，使用默认体质
+				fmt.Println("~~~~~~默认体质")
+				physiqueInfo, err = s0.GetPhysiqueInfo("默认体质")
+				if err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{"message": "获取默认体质信息错误: " + err.Error()})
+					return
+				}
+				// 把新的体质添加到数据库
+				if physiqueInfo == nil {
+					fmt.Println("~~~~~~新的体质添加到数据库")
+					p := &models.Physique{PhysiqueName: physiqueStringFinal}
+					cre, err := s0.CreatePhysique(p)
+					fmt.Println("~~~~~~新的体质添加到数据库", cre)
+
+					if err != nil {
+						c.JSON(http.StatusInternalServerError, gin.H{"message": "添加新体制错误: " + err.Error()})
+						return
+					}
+				}
 			}
 			// 提取 acupuncture_method 和 product_ids
 			acupunctureMethod := physiqueInfo.AcupunctureMethod
