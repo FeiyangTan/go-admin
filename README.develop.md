@@ -68,26 +68,33 @@ CREATE TABLE `article` (
 
 ------
 ## 更新服务
-### 本地代码上传到git
+### 本地代码上传到git（如果docker相关文件更新）
 ```bash
 # 本地
 git push -u origin main
+````
+### 更新本地“.env”文件到服务器（如果.env文件更新）
+```bash
+# 本地
+scp .env root@111.230.167.45:/opt/go-admin
 ````
 ### 链接服务器
 ```bash
 # 本地
 ssh root@111.230.167.45
 ````
-### 服务器更新代码
+### 服务器更新代码（如果docker相关文件更新）
 ```bash
 # 服务器
 cd /opt/go-admin
 git pull
-GOOS=linux GOARCH=amd64 go build -o go-admin main.go #构建新的可执行文件
 ````
-### 上传新的docker image
+### 上传新的docker image(确保本地的docker在运行)
 ```bash
-# 本地，在 M1/M2 上构建 amd64 镜像并直接输出成 tar 文件
+# 本地
+# 构建新的可执行文件
+GOOS=linux GOARCH=amd64 go build -o go-admin main.go 
+# 在 M1/M2 上构建 amd64 镜像并直接输出成 tar 文件
 docker buildx build \
   --platform linux/amd64 \
   -t aixiaoqi-server:latest \
@@ -99,10 +106,11 @@ scp aixiaoqi-server.tar root@111.230.167.45:/opt/go-admin
 ### 删除旧的服务
 ```bash
 # 服务器
+cd /opt/go-admin
 docker compose down #停止并移除旧容器
 
 docker images               # 找到 a ixiaoqi-server:latest 的 IMAGE ID
-docker rmi <IMAGE_ID>  #删除旧的docker镜像
+docker rmi aixiaoqi-server:latest  #删除旧的docker镜像
 ````
 ### 重启docker container
 ```bash

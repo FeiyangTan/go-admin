@@ -22,8 +22,11 @@ type WechatDiagnosis struct {
 // @Summary 获取诊疗结果列表
 // @Description 获取诊疗结果列表
 // @Tags 诊疗结果
-// @Param openId query string false "微信 OpenID"
+// @Param openId query string false "微信昵称"
 // @Param diagnosisType query string false "诊疗类型"
+// @Param diagnosisPhysique1 query string false "体质1名称"
+// @Param diagnosisPhysique2 query string false "体质2名称"
+// @Param diagnosisResult query string false "诊疗结果 JSON 字符串"
 // @Param pageSize query int false "页条数"
 // @Param pageIndex query int false "页码"
 // @Success 200 {object} response.Response{data=response.Page{list=[]models.WechatDiagnosis}} "{"code": 200, "data": [...]}"

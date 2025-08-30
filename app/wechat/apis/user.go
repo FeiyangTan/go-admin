@@ -3,13 +3,12 @@ package apis
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-admin-team/go-admin-core/sdk/api"
-	"go-admin/app/wechat/service"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"github.com/go-admin-team/go-admin-core/sdk/api"
 	"go-admin/app/wechat/config"
+	"go-admin/app/wechat/service"
 	"go-admin/app/wechat/util"
+	"net/http"
 )
 
 // WxSessionResp 用于接收微信 jscode2session 接口的返回
@@ -149,3 +148,55 @@ func (u *UserAPI) SetUserInfo(c *gin.Context) {
 	})
 
 }
+
+//type UserAPI struct{ api.Api }
+//
+//// POST /api/v1/wechat/login
+//func (e *UserAPI) Login(c *gin.Context) {
+//	// 1. 初始化 Api 上下文和 ORM
+//	var req dto.LoginReq
+//	if err := e.MakeContext(c).MakeOrm().Bind(&req).Errors; err != nil {
+//		e.Error(http.StatusBadRequest, err, "初始化或参数错误: "+err.Error())
+//		return
+//	}
+//
+//	// 2. 调用service
+//	s := service.WechatUser{}
+//	if err := e.MakeService(&s.Service).Errors; err != nil {
+//		e.Error(http.StatusInternalServerError, err, "服务初始化失败")
+//		return
+//	}
+//
+//	resp, err := s.Login(c.Request.Context(), &req)
+//	if err != nil {
+//		e.Error(http.StatusInternalServerError, err, "登录失败: "+err.Error())
+//		return
+//	}
+//
+//	// 3. 返回结果
+//	e.OK(resp, "登录成功")
+//}
+//
+//// POST /api/v1/wechat/setUserInfo
+//func (e *UserAPI) SetUserInfo(c *gin.Context) {
+//	// 1. 初始化 Api 上下文和 ORM
+//	var req dto.SetUserInfoReq
+//	if err := e.MakeContext(c).MakeOrm().Bind(&req).Errors; err != nil {
+//		e.Error(http.StatusBadRequest, err, "初始化或参数错误: "+err.Error())
+//		return
+//	}
+//
+//	// 2. 调用service
+//	wu := service.NewWechatUser(nil)         // 初始化 wc
+//	if err := e.MakeService(&wu.Service).Errors; err != nil {
+//		e.Error(http.StatusInternalServerError, err, "服务初始化失败")
+//		return
+//	}
+//	if err := wu.SetUserInfo(c.Request.Context(), &req); err != nil {
+//		e.Error(http.StatusInternalServerError, err, "更新失败: "+err.Error())
+//		return
+//	}
+//
+//	// 3. 返回结果
+//	e.OK(gin.H{"state": "success"}, "更新成功")
+//}

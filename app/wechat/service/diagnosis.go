@@ -2,10 +2,13 @@
 package service
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/go-admin-team/go-admin-core/sdk/api"
 	"go-admin/app/wechat/models"
 	"gorm.io/datatypes"
+	"strings"
 )
 
 type WechatDiagnosisService struct {
@@ -18,13 +21,21 @@ func NewWechatDiagnosisService(e *api.Api) *WechatDiagnosisService {
 }
 
 // 新增Diagnosis记录
-func (s *WechatDiagnosisService) AddDiagnosis(openid string, diagnosisType string, diagnosisResult datatypes.JSON) error {
+func (s *WechatDiagnosisService) AddDiagnosis(openid string, diagnosisType string, dataMap map[string]interface{}) error {
 	db, _ := s.GetOrm() // 从 s.Api 已初始化的 Orm 拿到 *gorm.DB
+
+	// 获取 data 中的 "data" 字段
+	var diagnosisJSON datatypes.JSON
+	if b, err := json.Marshal(dataMap); err == nil {
+		diagnosisJSON = datatypes.JSON(b)
+	} else {
+		return errors.New("诊断结果序列化失败: " + err.Error())
+	}
 
 	// 新增Diagnosis记录
 	record := models.Diagnosis{
 		OpenID:          openid,
-		DiagnosisResult: diagnosisResult,
+		DiagnosisResult: diagnosisJSON,
 		DiagnosisType:   diagnosisType,
 	}
 
@@ -70,4 +81,54 @@ func (s *WechatDiagnosisService) GetDiagnosisList(openid string, diagnosisType s
 	}
 
 	return diagnoses, total, nil
+}
+
+// 获取第一个体质名称
+func GetPhysiqueName(dataMap map[string]interface{}) (string, string) {
+	//fmt.Println("~~~physique:", physique)
+	// 1. 获取体质名称
+	var physiqueString string
+	var newPhysiqueString string
+	if s, ok := dataMap["physique_name"].(string); ok {
+		physiqueString = s
+		newPhysiqueString = strings.ReplaceAll(s, "体质", "")
+	} else {
+		physiqueString = "默认体质"
+	}
+	//fmt.Println("physique string:", physiqueString)
+	// 2. 获取第一个体质名称
+	var firstPhysique string
+	if idx := strings.Index(physiqueString, "、"); idx != -1 {
+		firstPhysique = physiqueString[:idx]
+	} else {
+		firstPhysique = physiqueString
+	}
+
+	return firstPhysique, newPhysiqueString
+}
+
+// 添加自定义疗法
+func GetAcupunctureMethod(dataMap map[string]interface{}, acupunctureMethod *models.Physique) map[string]interface{} {
+	if advicesMap, ok := dataMap["advices"].(map[string]interface{}); ok {
+		if treatments, ok := advicesMap["treatment"].([]interface{}); ok {
+
+			// 构造新的一组内容
+			newItems := []interface{}{
+				map[string]interface{}{"advice": acupunctureMethod.AcupunctureMethod,
+					"title": "三才河洛灸组穴"},
+				map[string]interface{}{"advice": acupunctureMethod.EighteenMethod,
+					"title": "药食同源亿草十八宝调理"},
+				map[string]interface{}{"advice": acupunctureMethod.WellnessMethod,
+					"title": "日常养生建议"},
+			}
+
+			// 添加到数组
+			treatments = append(newItems, treatments...)
+
+			advicesMap["treatment"] = treatments
+
+		}
+		return advicesMap
+	}
+	return nil
 }
