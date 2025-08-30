@@ -7,17 +7,17 @@ import (
 	"gorm.io/gorm"
 )
 
-type WechatUserService struct {
+type WechatUserService1 struct {
 	api.Api
 }
 
 // NewWechatUserService 会在 Handler 里被 MakeService 调用
-func NewWechatUserService(e *api.Api) *WechatUserService {
-	return &WechatUserService{*e}
+func NewWechatUserService(e *api.Api) *WechatUserService1 {
+	return &WechatUserService1{*e}
 }
 
 // GetOrCreateUser 自动使用 e.Orm
-func (s *WechatUserService) GetOrCreateUser(openid, nickname, avatar string) (*models.User, error) {
+func (s *WechatUserService1) GetOrCreateUser(openid, nickname, avatar string) (*models.User, error) {
 	db, _ := s.GetOrm() // 从 s.Api 已初始化的 Orm 拿到 *gorm.DB
 	var user models.User
 	if err := db.Where("open_id = ?", openid).First(&user).Error; err != nil {
@@ -34,7 +34,7 @@ func (s *WechatUserService) GetOrCreateUser(openid, nickname, avatar string) (*m
 }
 
 // Diagnosis数量+1
-func (s *WechatUserService) AddDiagnosisCount(openid string, diagnosisType string) error {
+func (s *WechatUserService1) AddDiagnosisCount(openid string, diagnosisType string) error {
 	db, _ := s.GetOrm() // 从 s.Api 已初始化的 Orm 拿到 *gorm.DB
 
 	switch diagnosisType {
@@ -60,7 +60,7 @@ func (s *WechatUserService) AddDiagnosisCount(openid string, diagnosisType strin
 }
 
 // 查询用户Diagnosis数量
-func (s *WechatUserService) GetUserDiagnosisNum(openid string) (faceCount uint16, tongueCount uint16, err error) {
+func (s *WechatUserService1) GetUserDiagnosisNum(openid string) (faceCount uint16, tongueCount uint16, err error) {
 	db, _ := s.GetOrm() // 从 s.Api 已初始化的 Orm 拿到 *gorm.DB
 
 	var user models.User
@@ -79,8 +79,9 @@ func (s *WechatUserService) GetUserDiagnosisNum(openid string) (faceCount uint16
 	return faceCount, tongueCount, nil
 }
 
-// 修改用户名称和头像
-func (s *WechatUserService) SetUserInfo(openid, nickname, avatarUrl string) error {
+//修改用户名称和头像
+
+func (s *WechatUserService1) SetUserInfo(openid, nickname, avatarUrl string) error {
 	db, _ := s.GetOrm() // 从 s.Api 已初始化的 Orm 拿到 *gorm.DB
 	// 修改用户名称和头像
 	if err := db.
@@ -95,3 +96,83 @@ func (s *WechatUserService) SetUserInfo(openid, nickname, avatarUrl string) erro
 	}
 	return nil
 }
+
+//type WechatUserService struct {
+//	sdkservice.Service
+//}
+//
+//type WechatUser struct {
+//	sdkservice.Service
+//	wc clients.WechatClient
+//}
+//
+//func NewWechatUser(svc *sdkservice.Service) *WechatUser {
+//	r := &WechatUser{wc: clients.NewWechatClient()}
+//	if svc != nil {
+//		r.Service = *svc
+//	}
+//	return r
+//}
+//
+//// 登录：微信 code -> openid -> GetOrCreate -> 生成 JWT -> 返回
+//func (s *WechatUser) Login(ctx context.Context, in *dto.LoginReq) (*dto.LoginResp, error) {
+//	wx, err := s.wc.Jscode2Session(ctx, config.AppID, config.AppSecret, in.Code)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	// ✅ 复用当前上下文：直接字面量构造，不再调用旧的 NewWechatUserService(...)
+//	us := &WechatUserService{Service: s.Service}
+//
+//	user, err := us.GetOrCreateUser(wx.OpenID, config.DefaultNickName, config.DefaultAvatarURL)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	token, err := util.GenerateToken(user.OpenID)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	out := &dto.LoginResp{Token: token}
+//	out.User.OpenID = user.OpenID
+//	out.User.NickName = user.NickName
+//	out.User.AvatarURL = user.AvatarURL
+//	return out, nil
+//}
+//
+//// GetOrCreateUser 根据 open_id 查找用户，不存在则按给定昵称与头像创建
+//func (s *WechatUserService) GetOrCreateUser(openid, nickname, avatarURL string) (models.User, error) {
+//	var user models.User
+//	db := s.Orm
+//
+//	// open_id 建议在 models.User 上有唯一索引
+//	err := db.Where("open_id = ?", openid).First(&user).Error
+//	if errors.Is(err, gorm.ErrRecordNotFound) {
+//		user = models.User{
+//			OpenID:    openid,
+//			NickName:  nickname,
+//			AvatarURL: avatarURL,
+//		}
+//		if err := db.Create(&user).Error; err != nil {
+//			return models.User{}, err
+//		}
+//		return user, nil
+//	}
+//	if err != nil {
+//		return models.User{}, err
+//	}
+//	return user, nil
+//}
+//
+//// SetUserInfo 更新昵称与头像
+//func (s *WechatUserService) SetUserInfo(openid, nickname, avatarURL string) error {
+//	db := s.Orm
+//	return db.
+//		Model(&models.User{}).
+//		Where("open_id = ?", openid).
+//		Updates(map[string]any{
+//			"nick_name":  nickname,
+//			"avatar_url": avatarURL,
+//		}).Error
+//}
