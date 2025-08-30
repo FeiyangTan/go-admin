@@ -21,7 +21,7 @@ func NewWechatDiagnosisService(e *api.Api) *WechatDiagnosisService {
 }
 
 // 新增Diagnosis记录
-func (s *WechatDiagnosisService) AddDiagnosis(openid string, diagnosisType string, dataMap map[string]interface{}) error {
+func (s *WechatDiagnosisService) AddDiagnosis(openid string, diagnosisType string, diagnosisPhysique string, dataMap map[string]interface{}) error {
 	db, _ := s.GetOrm() // 从 s.Api 已初始化的 Orm 拿到 *gorm.DB
 
 	// 获取 data 中的 "data" 字段
@@ -32,11 +32,22 @@ func (s *WechatDiagnosisService) AddDiagnosis(openid string, diagnosisType strin
 		return errors.New("诊断结果序列化失败: " + err.Error())
 	}
 
+	// 获取diagnosisPhysique中的信息
+	var majorDiagnosis string
+	var minorDiagnosis string
+	majorDiagnosis, minorDiagnosis, ok := strings.Cut(diagnosisPhysique, "、")
+	if !ok {
+		majorDiagnosis = diagnosisPhysique
+		minorDiagnosis = ""
+	}
+
 	// 新增Diagnosis记录
 	record := models.Diagnosis{
-		OpenID:          openid,
-		DiagnosisResult: diagnosisJSON,
-		DiagnosisType:   diagnosisType,
+		OpenID:             openid,
+		DiagnosisResult:    diagnosisJSON,
+		DiagnosisType:      diagnosisType,
+		DiagnosisPhysique1: majorDiagnosis,
+		DiagnosisPhysique2: minorDiagnosis,
 	}
 
 	// 执行插入

@@ -16,9 +16,10 @@ type DiagnosisAPI struct {
 }
 
 type AddDiagnosisReq struct {
-	OpenID          string         `json:"open_id" binding:"required"`
-	DiagnosisType   string         `json:"diagnosis_type" binding:"required"`
-	DiagnosisResult datatypes.JSON `json:"diagnosis_result" binding:"required"`
+	OpenID            string         `json:"open_id" binding:"required"`
+	DiagnosisType     string         `json:"diagnosis_type" binding:"required"`
+	DiagnosisPhysique string         `json:"diagnosis_physique"`
+	DiagnosisResult   datatypes.JSON `json:"diagnosis_result" binding:"required"`
 }
 
 type GetUserDiagnosisNumReq struct {
@@ -73,6 +74,7 @@ func (e *DiagnosisAPI) AddDiagnosis(c *gin.Context) {
 	// 3 存入数据库：
 	openID := req.OpenID
 	diagnosisType := req.DiagnosisType
+	diagnosisPhysique := req.DiagnosisPhysique
 
 	fmt.Println("~~~诊疗类型：", diagnosisType)
 	// 3.1 用户数据库，diagnosis数量+1
@@ -84,7 +86,7 @@ func (e *DiagnosisAPI) AddDiagnosis(c *gin.Context) {
 
 	// 3.2 诊疗数据库，记录diagnosis
 	s2 := service.NewWechatDiagnosisService(&e.Api)
-	if err := s2.AddDiagnosis(openID, diagnosisType, resMap); err != nil {
+	if err := s2.AddDiagnosis(openID, diagnosisType, diagnosisPhysique, resMap); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "添加诊疗记录错误: " + err.Error()})
 		return
 	}
