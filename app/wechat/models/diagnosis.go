@@ -13,6 +13,7 @@ type Diagnosis struct {
 	DiagnosisResult    datatypes.JSON `json:"diagnosis_result" gorm:"type:longtext;serializer:json;not null"`
 	DiagnosisPhysique1 string         `json:"diagnosis_physique1,omitempty" gorm:"column:diagnosis_physique1;size:32;index:idx_wd_physique1;comment:主体质"`
 	DiagnosisPhysique2 string         `json:"diagnosis_physique2,omitempty" gorm:"column:diagnosis_physique2;size:32;index:idx_wd_physique2;comment:副体质"`
+	DiagnosisNote      string         `json:"diagnosis_note" gorm:"column:diagnosis_note;size:128"`
 }
 
 // TableName 指定了模型对应的数据库表名

@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"github.com/casbin/casbin/v2/util"
 	"net/http"
 
@@ -38,6 +39,8 @@ func AuthCheckRole() gin.HandlerFunc {
 			return
 		}
 		res, err = e.Enforce(v["rolekey"], c.Request.URL.Path, c.Request.Method)
+		fmt.Println("~~~~c.Request.URL.Path: ", c.Request.URL.Path)
+		fmt.Println("~~~~c.Request.Method: ", c.Request.Method)
 		if err != nil {
 			log.Errorf("AuthCheckRole error:%s method:%s path:%s", err, c.Request.Method, c.Request.URL.Path)
 			response.Error(c, 500, err, "")
@@ -48,6 +51,7 @@ func AuthCheckRole() gin.HandlerFunc {
 			log.Infof("isTrue: %v role: %s method: %s path: %s", res, v["rolekey"], c.Request.Method, c.Request.URL.Path)
 			c.Next()
 		} else {
+
 			log.Warnf("isTrue: %v role: %s method: %s path: %s message: %s", res, v["rolekey"], c.Request.Method, c.Request.URL.Path, "当前request无权限，请管理员确认！")
 			c.JSON(http.StatusOK, gin.H{
 				"code": 403,

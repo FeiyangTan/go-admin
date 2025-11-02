@@ -143,3 +143,22 @@ func GetAcupunctureMethod(dataMap map[string]interface{}, acupunctureMethod *mod
 	}
 	return nil
 }
+
+// 修改Diagnosis的node
+func (s *WechatDiagnosisService) EditDiagnosisNote(id int, note string) error {
+	db, _ := s.GetOrm() // 从 s.Api 已初始化的 Orm 拿到 *gorm.DB
+
+	// 更新记录
+	result := db.Model(&models.Diagnosis{}).
+		Where("id = ?", id).
+		Update("diagnosis_note", note)
+
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return errors.New("no rows updated / record not found")
+	}
+
+	return nil
+}

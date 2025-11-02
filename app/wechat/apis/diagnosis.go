@@ -49,6 +49,11 @@ type DiagnosisReq struct {
 	DiagnosisType string       `json:"diagnosis_type" binding:"required"`
 }
 
+type EditDiagnosisNoteReq struct {
+	ID   int    `json:"id" binding:"required"`
+	Note string `json:"note" binding:"required"`
+}
+
 // POST /api/v1/wechat/addDiagnosis
 func (e *DiagnosisAPI) AddDiagnosis(c *gin.Context) {
 
@@ -251,4 +256,36 @@ func (e *DiagnosisAPI) DiagnosisList(c *gin.Context) {
 		"diagnosisList": diagnosisList,
 		"total":         total,
 	})
+}
+
+// POST /api/v1/wechat/editDiagnosisNote
+func (e *DiagnosisAPI) EditDiagnosisNote(c *gin.Context) {
+
+	// 1. 初始化 Api 上下文和 ORM
+	if err := e.MakeContext(c).MakeOrm().Errors; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "初始化失败: " + err.Error()})
+		return
+	}
+
+	// 2. 读取并校验参数
+	var req EditDiagnosisNoteReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "请求参数错误: " + err.Error()})
+		return
+	}
+	//if req.Note == "" {
+	//	c.JSON(http.StatusBadRequest, gin.H{"message": "note 不能为空"})
+	//	return
+	//}
+
+	// 3. 调用 Service 按 id 更新 note
+
+	svc := service.NewWechatDiagnosisService(&e.Api)
+	if err := svc.EditDiagnosisNote(req.ID, req.Note); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "更新诊疗备注失败: " + err.Error()})
+		return
+	}
+
+	// 4. 返回结果
+	c.JSON(http.StatusOK, gin.H{"state": "success"})
 }

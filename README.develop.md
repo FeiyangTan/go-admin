@@ -33,6 +33,15 @@ docker compose up #执行docker-compose文件
 ````
 
 ---------------------------------
+## 初始化项目
+* 修改config/settings.yml中的：
+![img_4.png](img_4.png)
+
+* 初始化数据库
+```bash
+go run main.go migrate -c config/settings.dev.yml
+```
+---------------------------------
 ## 备注信息
 * 创建新表后，手动创建数据库
 ```bash
